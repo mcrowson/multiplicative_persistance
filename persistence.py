@@ -8,6 +8,8 @@ import logging
 STEPS_TO_FIND = 11
 MINIMUM_DIGITS = 1
 
+MULTI_PROCESS = False
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -93,34 +95,32 @@ def main():
     s = datetime.now()
     logger.info("Starting at {}".format(s))
     
-    # Multi Process
-    p_count = mp.cpu_count()
-    q = mp.Queue(10)  # Keep buffer of items in queue
-    q_loader = mp.Process(target=load_queue, args=(q, p_count))
-    q_loader.start()
+    if MULTI_PROCESS:
+        # Multi Process
+        p_count = mp.cpu_count()
+        q = mp.Queue(10)  # Keep buffer of items in queue
+        q_loader = mp.Process(target=load_queue, args=(q, p_count))
+        q_loader.start()
 
-    processes = [mp.Process(target=process_thread, args=(q,p_count)) for _ in range(p_count)]
-    [p.start() for p in processes]
-    
-    for p in processes:
-        # Wait on all processes to stop due to a find
-        p.join()
+        processes = [mp.Process(target=process_thread, args=(q,p_count)) for _ in range(p_count)]
+        [p.start() for p in processes]
+        
+        for p in processes:
+            # Wait on all processes to stop due to a find
+            p.join()
 
-    q_loader.terminate()
+        q_loader.terminate()
 
-    '''
+    else:
     
-    # Single Process
-    for i, n in enumerate(combs(MINIMUM_DIGITS)):
-        steps = reduced_steps(int(n))
-        if steps == STEPS_TO_FIND:
-            logger.info("Found {} in {} steps".format(n, steps))
-            break
-        if i == 100000:
-            logger.info("Ending")
-            break
+        # Single Process
+        for n in combs(MINIMUM_DIGITS):
+            steps = reduced_steps(int(n))
+            if steps == STEPS_TO_FIND:
+                logger.info("Found {} in {} steps".format(n, steps))
+                break
     
-    '''
+    
     logger.info("Took {}".format(datetime.now() - s))
     
 if __name__ == "__main__":
