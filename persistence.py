@@ -45,23 +45,13 @@ def combs(minimum_digits):
                     yield ''.join(res)
         
 
-@lru_cache(maxsize=None)
-def old_n_to_tuple(x):
-    # Convert number into tuple of digits
-    arr = ()
-    while x >= 10:
-        arr = (x%10,) + arr
-        x = x//10
-    arr = (x,) + arr
-    return arr
-
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=2**20)  # About 1 mil, docs say to use power of 2
 def n_to_tuple(x):
     # Convert number into tuple of digits
     return tuple(map(int, str(x)))
 
 
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=2**20)  # About 1 mil, docs say to use a power of 2
 def mult_all(n_tuple):
     return reduce(mul, n_tuple, 1)
 
@@ -77,7 +67,7 @@ def reduced_steps(n):
 
 
 def consume_queue(generator_queue):
-    # Queue consumer with stopper
+    # Queue consumer generator
     while True:
         item = generator_queue.get()
         if item is StopIteration: break
@@ -85,7 +75,7 @@ def consume_queue(generator_queue):
 
 
 def process_thread(generator_queue, process_count):
-    # Takes items from queue and processes
+    # Takes items from queue and processes until it finds steps
     for item in consume_queue(generator_queue):
         steps = reduced_steps(int(item))
         if steps == STEPS_TO_FIND:

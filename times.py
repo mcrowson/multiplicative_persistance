@@ -1,6 +1,8 @@
 import timeit
-
 from persistence import *
+
+# Just timing some functions alternatives while devving 
+
 '''
 recuse_time = timeit.timeit('n_to_tuple(12345678999999)', setup='from persistence import n_to_tuple')
 print(n_to_tuple(12345678999999))
@@ -25,10 +27,4 @@ print(reduced_steps3(12345678999999))
 print(recuse_time)
 '''
 
-def more_combs():
-    for i, _ in enumerate(combs(200)):
-        if i == 100:
-            return
 
-recuse_time = timeit.timeit('more_combs()', setup='from __main__ import more_combs')
-print(recuse_time)
