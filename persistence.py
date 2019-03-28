@@ -10,6 +10,7 @@ from operator import mul
 STEPS_TO_FIND = 12  # Mimimum number of steps for logging messages
 MINIMUM_DIGITS = 1  # Minimum digits to start analyzing
 MULTI_PROCESS = False  # Multiprocessing approach. Faster for digit lengths over ~ 70, Slower for less than
+# Multiprocess approach does not generate frequencies csv
 MAXIMUM_NUMBERS_TO_ANALYZE = 10000000 # Only calc steps for X numbers from generator, set None to look infinitely
 
 logger = logging.getLogger(__name__)
