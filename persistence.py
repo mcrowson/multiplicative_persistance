@@ -8,10 +8,10 @@ from functools import reduce
 from operator import mul
 
 STEPS_TO_FIND = 12  # Mimimum number of steps for logging messages
-MINIMUM_DIGITS = 1  # Minimum digits to start analyzing
-MULTI_PROCESS = False  # Multiprocessing approach. Faster for digit lengths over ~ 70, Slower for less than
+MINIMUM_DIGITS = 233  # Minimum digits to start analyzing
+MULTI_PROCESS = True  # Multiprocessing approach. Faster for digit lengths, slower for smaller
 # Multiprocess approach does not generate frequencies csv
-MAXIMUM_NUMBERS_TO_ANALYZE = 10000000 # Only calc steps for X numbers from generator, set None to look infinitely
+MAXIMUM_NUMBERS_TO_ANALYZE = None # Only calc steps for X numbers from generator, set None to look infinitely
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -27,7 +27,7 @@ logger.addHandler(fh)
 
 counts = defaultdict()
 
-def combs(minimum_digits):
+def combs(minimum_digits=1):
     # Generates ordered combinations of numbers according to a few rules
     # No 0, 1, or 5
     # No 2/3 or 2/4 or 3/3 combos
@@ -50,26 +50,13 @@ def combs(minimum_digits):
                     res = f + b
                     yield ''.join(res)
         
-def n_to_tuple(x):
-    # Convert number into tuple of digits
-    # 12345 -> (1, 2, 3, 4, 5)
-    return tuple(map(int, str(x)))
 
+def reduced_steps(n, steps=0):
+    if n < 10: return steps
+    n_tuple = map(int, str(n)) # 12345 -> (1, 2, 3, 4, 5)
+    n = reduce(mul, n_tuple, 1) # (1, 2, 3, 4, 5) -> 120
+    return reduced_steps(n, steps+1)
 
-def mult_all(n_tuple):
-    # Multiply a tuple of numbers together
-    # (1, 2, 3, 4, 5) -> 120
-    return reduce(mul, n_tuple, 1)
-
-
-def reduced_steps(n):
-    # Calculate steps in multiplicative persistence
-    steps = 0
-    while n >= 10:
-        steps += 1
-        n_tuple = n_to_tuple(n)
-        n = mult_all(n_tuple)
-    return steps
 
 
 def consume_queue(generator_queue):
